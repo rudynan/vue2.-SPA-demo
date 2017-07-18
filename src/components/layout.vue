@@ -2,9 +2,9 @@
   <div>
     <div class="app-header">
       <div class="app-header-inner">
-
-        <img src="../assets/logo.png">
-
+        <router-link :to="{path: '/'}">
+          <img src="../assets/logo.png">
+        </router-link>
         <div class="header-nav">
           <ul class="nav-list">
             <li> {{username}}</li>
@@ -40,7 +40,7 @@
   </div>
 </template>
     <script>
-import Dialog from './dialog'
+import Dialog from './base/dialog'
 import logForm from './logForm'
 import regForm from './regForm'
 export default {
@@ -72,7 +72,8 @@ export default {
       this[attr] = false
     },
     onSuccessLog(data) {
-      console.log(data)
+      // console.log(data)
+      this.closeDialog('isShowLogDialog')
       this.username = data.username
     }
   }
@@ -167,6 +168,7 @@ video {
   font: inherit;
   vertical-align: baseline;
 }
+
 
 
 
