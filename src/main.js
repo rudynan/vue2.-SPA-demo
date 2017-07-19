@@ -10,6 +10,7 @@ import publish from './pages/detial/publish'
 import analysis from './pages/detial/analysis'
 import forecast from './pages/detial/forecast'
 import count from './pages/detial/count'
+import orderlist from './components/base/orderList'
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
@@ -38,7 +39,10 @@ let router = new VueRouter({
         }, {
           path: 'publish',
           component: publish
-        },
+        }, {
+          path: '/orderlist',
+          component: orderlist
+        }
       ]
     }
   ]

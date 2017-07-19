@@ -99,12 +99,15 @@
         </tr>
       </table>
       <h3 class="buy-dialog-title">请选择银行</h3>
-      <bankchooser></bankchooser>
-      <div class="button buy-dialog-btn" >
+      <bankchooser @on-change="onchangebanks"></bankchooser>
+      <div class="button buy-dialog-btn" @click="confirmBuy">
         确认购买
       </div>
+      <mydialog :is-show="isShowErrDialog" @on-close="hideErrDialog">
+        支付失败！
+      </mydialog>
     </mydialog>
-
+    <checkOrder :isShowCheckDialog='isShowCheckOrder' @on-close-check-dialog="hideCheckOrder"></checkOrder>
   </div>
 </template>
 <script>
@@ -113,11 +116,12 @@ import chooser from "../../components/base/chooser"
 import multiplyChooserser from "../../components/base/multiplyChooser"
 import counter from "../../components/base/counter"
 import dialog from "../../components/base/dialog"
-import bankchooser from "../../components/base/bankChooser"
+import bankchooser from "../../components/base/bankChooser.vue"
+import checkOrder from "../../components/base/checkOrder"
 
 import _ from "lodash"
 export default {
-  components: { selection, chooser, multiplyChooserser, counter, mydialog: dialog ,bankchooser},
+  components: { selection, chooser, multiplyChooserser, counter, mydialog: dialog, bankchooser, checkOrder },
   data() {
     return {
       buyNum: 1,
@@ -125,6 +129,7 @@ export default {
       versions: [],
       period: {},
       price: 0,
+      bankId: '',
       versionList: [
         {
           label: '客户版',
@@ -209,8 +214,42 @@ export default {
     hidePayDialog() {
       console.log('close');
       this.isShowPayDialog = false
+    },
+    onchangebanks(bankObj) {
+      this.bankId = bankObj.id
+      // console.log( this.bankId )
+    },
+    hideErrDialog() {
+      this.isShowErrDialog = false
+    },
+    hideCheckOrder(){
+      this.isShowCheckOrder = false
+    },
+    confirmBuy() {
+      let buyVersionsArray = _.map(this.versions, (item) => {
+        return item.value
+      })
+      let reqParams = {
+        buyNumber: this.buyNum,
+        buyType: this.buyType.value,
+        period: this.period.value,
+        version: buyVersionsArray.join(','),
+        bankId: this.bankId
+      }
+      // console.log(version)
+      this.$http.get('/api/createOrder', reqParams)
+        .then((res) => {
+          this.orderId = res.data.orderId
+          this.isShowCheckOrder = true
+          this.isShowPayDialog = false
+        }, (err) => {
+          console.log(err)
+          this.isShowPayDialog = false
+          this.isShowErrDialog = true
+        })
     }
   },
+
   mounted() {
     this.buyNum = 0
     this.buyType = this.buyTypes[0]
